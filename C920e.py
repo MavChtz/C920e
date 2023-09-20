@@ -51,8 +51,10 @@ def main():
         try:
             camera.ctrl_transfer(0x21, 0x01, 0x1000, 0x0b00, ACTIVATE_MIC if args.microphone_state == "on" else DEACTIVATE_MIC)
         except usb.core.USBError as e:
-            # This exception (usb.core.USBError: [Errno 5] Input/Output Error) is expected because the device disconnects once the URB is sent
-            if e.errno != 5:
+            # These exceptions are expected because the device disconnects once the URB is sent:
+            # - usb.core.USBError: [Errno 5] Input/Output Error
+            # - usb.core.USBError: [Errno 19] No such device (it may have been disconnected)
+            if e.errno != 5 and e.errno != 19:
                 print(f"Unexpected error:\n{e}")
                 continue
 
