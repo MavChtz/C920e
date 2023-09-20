@@ -5,18 +5,32 @@ import time
 import argparse
 import usb.core
 
-activateMic = [1]
-deactivateMic = [0]
+ACTIVATE_MIC = [1]
+DEACTIVATE_MIC = [0]
+SUPPORTED_CAMERA_IDS = {
+    0x08b6: "Logi Webcam C920e",
+    0x085b: "Logi Webcam C925e",
+}
+
+VENDOR_LOGITECH = 0x046d
+VENDOR_LOGITECH_STR = "Logitech, Inc."
+
+def format_supported_cameras():
+    res = ""
+    for id, name in SUPPORTED_CAMERA_IDS.items():
+        res += f"{VENDOR_LOGITECH:0{4}x}:{id:0{4}x} {VENDOR_LOGITECH_STR} {name}\n"
+    return res
 
 def main():
     parser = argparse.ArgumentParser(
                         prog="C920e.py",
-                        description="Enable/disable the microphone of Logitech C920e webcams")
+                        formatter_class=argparse.RawDescriptionHelpFormatter,
+                        description="Enable/disable the microphone of Logitech C9XXe series webcams.\n\nsupported devices:\n" + format_supported_cameras())
     parser.add_argument("microphone_state", choices=['on', 'off'])
     args = parser.parse_args()
 
     devCount = 0
-    cameras = usb.core.find(find_all=True, idVendor=0x046d, idProduct=0x08b6)
+    cameras = usb.core.find(find_all=True, custom_match=lambda d: d.idVendor == VENDOR_LOGITECH and d.idProduct in SUPPORTED_CAMERA_IDS)
     for camera in cameras:
         devCount += 1
         print(f"Configuring microphone on device: {devCount}")
@@ -35,7 +49,7 @@ def main():
 
         camera.set_configuration()
         try:
-            camera.ctrl_transfer(0x21, 0x01, 0x1000, 0x0b00, activateMic if args.microphone_state == "on" else deactivateMic)
+            camera.ctrl_transfer(0x21, 0x01, 0x1000, 0x0b00, ACTIVATE_MIC if args.microphone_state == "on" else DEACTIVATE_MIC)
         except usb.core.USBError as e:
             # This exception (usb.core.USBError: [Errno 5] Input/Output Error) is expected because the device disconnects once the URB is sent
             if e.errno != 5:
