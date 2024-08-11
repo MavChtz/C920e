@@ -9,6 +9,7 @@ ACTIVATE_MIC = [1]
 DEACTIVATE_MIC = [0]
 SUPPORTED_CAMERA_IDS = {
     0x08b6: "Logi Webcam C920e",
+    0x08b7: "Logi Webcam C920e",
     0x085b: "Logi Webcam C925e",
 }
 
