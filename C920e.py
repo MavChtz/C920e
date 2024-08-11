@@ -9,6 +9,7 @@ ACTIVATE_MIC = [1]
 DEACTIVATE_MIC = [0]
 SUPPORTED_CAMERA_IDS = {
     0x08b6: "Logi Webcam C920e",
+    0x08b7: "Logi Webcam C920e",
     0x085b: "Logi Webcam C925e",
 }
 
@@ -31,6 +32,7 @@ def main():
 
     devCount = 0
     cameras = usb.core.find(find_all=True, custom_match=lambda d: d.idVendor == VENDOR_LOGITECH and d.idProduct in SUPPORTED_CAMERA_IDS)
+    breakpoint()
     for camera in cameras:
         devCount += 1
         print(f"Configuring microphone on device: {devCount}")
